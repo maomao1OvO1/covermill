@@ -168,7 +168,11 @@ footer#more .dot{margin:0 7px;opacity:.4}
 </div>
 
 <footer id="more">
-  <span class="by" id="openAbout">CoverMill · by @maomao1OvO1</span>
+  <span class="by" id="openAbout">CoverMill · 作者：毛毛</span>
+  <span class="dot">·</span>
+  <a href="https://github.com/maomao1OvO1" target="_blank" rel="noopener noreferrer">GitHub @maomao1OvO1</a>
+  <span class="dot">·</span>
+  <a href="#" id="mailLink">邮件 <span id="mailAddr"></span></a>
   <span class="dot">·</span>
   <a href="https://github.com/maomao1OvO1?tab=repositories" target="_blank" rel="noopener noreferrer">更多作品 ↗</a>
 </footer>
@@ -180,7 +184,7 @@ footer#more .dot{margin:0 7px;opacity:.4}
     <p>一次输入，六种平台尺寸一起出图。<br>图片只在你的浏览器里处理，不上传任何地方。</p>
     <div class="links">
       <a href="https://github.com/maomao1OvO1" target="_blank" rel="noopener noreferrer">GitHub · maomao1OvO1</a>
-      <a href="#" id="mailLink" data-u="hi" data-d="maomaowang.top">邮件联系 · hi@maomaowang.top</a>
+      <a href="#" id="mailLink2">邮件联系 · <span id="mailAddr2"></span></a>
       <a href="https://github.com/maomao1OvO1/covermill" target="_blank" rel="noopener noreferrer">项目源码 · CoverMill</a>
       <a href="https://github.com/maomao1OvO1?tab=repositories" target="_blank" rel="noopener noreferrer">作者的其它项目 ↗</a>
     </div>
@@ -714,12 +718,22 @@ function toast(msg){
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800);
 }
 
-$('#mailLink').onclick = e=>{
-  // 邮箱不写进静态 href，防止被垃圾邮件爬虫抓走；点击时才拼
+/* 邮箱在运行时才写进 DOM：静态 HTML 里没有明文，Cloudflare 的自动混淆就无从下手；
+   同时也没有 mailto 静态链接，爬虫抓不到。 */
+const MAIL_U = 'hi', MAIL_D = 'maomaowang.top';
+(function fillMail(){
+  const addr = MAIL_U + '@' + MAIL_D;
+  const a1 = document.getElementById('mailAddr');
+  const a2 = document.getElementById('mailAddr2');
+  if (a1) a1.textContent = addr;
+  if (a2) a2.textContent = addr;
+})();
+function openMail(e){
   e.preventDefault();
-  const a=e.currentTarget;
-  location.href = 'mailto:' + a.dataset.u + '@' + a.dataset.d;
-};
+  location.href = 'mailto:' + MAIL_U + '@' + MAIL_D;
+}
+document.getElementById('mailLink').onclick = openMail;
+document.getElementById('mailLink2').onclick = openMail;
 $('#openAbout').onclick = ()=> $('#about').classList.add('on');
 $('#closeAbout').onclick = ()=> $('#about').classList.remove('on');
 $('#about').onclick = e=>{ if (e.target.id==='about') $('#about').classList.remove('on'); };
