@@ -67,6 +67,10 @@ CoverMill 就是把这一步省掉：**输一次，六张一起出**。
 - 导出的是位图（PNG），不提供 SVG / PSD
 - 没有云存储，刷新页面后输入内容会丢（模板选择保留）
 
+## 关于作者
+
+更多项目：[github.com/maomao1OvO1](https://github.com/maomao1OvO1?tab=repositories)
+
 ## License
 
 MIT
