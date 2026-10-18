@@ -168,8 +168,10 @@ footer#more .dot{margin:0 7px;opacity:.4}
       <button data-a="center" class="on">居中</button>
       <button data-a="right">右对齐</button>
     </div>
-    <label>字号</label>
-    <div class="slider"><span>大小</span><input type="range" id="scale" min="70" max="150" value="100" step="5"><small id="scaleV">100%</small></div>
+    <label>字号（三块各自调）</label>
+    <div class="slider"><span>标题</span><input type="range" id="scaleT" min="60" max="180" value="100" step="5"><small id="scaleTV">100%</small></div>
+    <div class="slider"><span>副标题</span><input type="range" id="scaleS" min="50" max="200" value="100" step="5"><small id="scaleSV">100%</small></div>
+    <div class="slider"><span>署名</span><input type="range" id="scaleA" min="50" max="200" value="100" step="5"><small id="scaleAV">100%</small></div>
   </div>
 
   <div class="card">
@@ -243,7 +245,8 @@ const FONTS = [
   {id:'mono',  name:'等宽', stack:'"SF Mono","Menlo","Consolas","Noto Sans Mono CJK SC",monospace'},
 ];
 /* 排版状态：ty 是标题起始高度比例，align 覆盖模板默认，scale 是字号倍数 */
-const typo = {font:'sans', ty:30, align:'center', scale:100};
+const typo = {font:'sans', ty:30, align:'center', scale:100,
+  size:{title:100, subtitle:100, author:100}};   // 三块字号各自独立，百分比
 /* 三块文字各自的相对位置（0~1），可直接拖动 */
 const layout = {
   title:    {xr:0.5, yr:0.30},
@@ -576,9 +579,10 @@ function renderCover(canvas,size,tpl,data){
   // ── 标题 ──
   const tPos=layout.title;
   const tx=tPos.xr*W, ty=tPos.yr*H;
+  const tScale = (typo.size.title/100);
   const t=fitText(ctx,data.title||'标题',maxW,H*0.42,
-    Math.round((portrait?W*0.115:W*0.085)*(typo.scale/100)),
-    Math.round(W*0.045),'900',fam);
+    Math.round((portrait?W*0.115:W*0.085)*tScale),
+    Math.round(W*0.030),'900',fam);
   ctx.fillStyle=ink;
   let yy=ty;
   for(const line of t.lines){
@@ -596,8 +600,9 @@ function renderCover(canvas,size,tpl,data){
   if(data.subtitle){
     const sp=layout.subtitle;
     const sx=sp.xr*W, sy=sp.yr*H;
+    const sMul = (typo.size.subtitle/100);
     const st=fitText(ctx,data.subtitle,maxW,H*0.22,
-      Math.round(t.size*0.42),Math.round(W*0.028),'400',fam);
+      Math.round(t.size*0.42*sMul),Math.round(W*0.018),'400',fam);
     ctx.fillStyle=accent; ctx.globalAlpha=0.95;
     let y2=sy;
     for(const line of st.lines){
@@ -615,7 +620,7 @@ function renderCover(canvas,size,tpl,data){
   if(data.author){
     const ap=layout.author;
     const ax=ap.xr*W, ay=ap.yr*H;
-    const aSize=Math.round(W*0.030);
+    const aSize=Math.max(8, Math.round(W*0.030*(typo.size.author/100)));
     ctx.font=`600 ${aSize}px ${fam}`;
     ctx.fillStyle=ink; ctx.globalAlpha=0.6;
     ctx.fillText(data.author,ax,ay);
@@ -878,7 +883,9 @@ function buildFonts(){
   });
 }
 $('#ty').oninput=e=>{ typo.ty=+e.target.value; layout.title.yr=typo.ty/100; $('#tyV').textContent=typo.ty+'%'; schedulePreview(); };
-$('#scale').oninput=e=>{ typo.scale=+e.target.value; $('#scaleV').textContent=typo.scale+'%'; schedulePreview(); };
+$('#scaleT').oninput=e=>{ typo.size.title=+e.target.value; $('#scaleTV').textContent=typo.size.title+'%'; schedulePreview(); };
+$('#scaleS').oninput=e=>{ typo.size.subtitle=+e.target.value; $('#scaleSV').textContent=typo.size.subtitle+'%'; schedulePreview(); };
+$('#scaleA').oninput=e=>{ typo.size.author=+e.target.value; $('#scaleAV').textContent=typo.size.author+'%'; schedulePreview(); };
 $('#alignBtns').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
   typo.align=b.dataset.a;
